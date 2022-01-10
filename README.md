@@ -38,6 +38,6 @@ https://www.kaggle.com/t/b7ed697207f0401b94a1f5c49c559d68
 
 # Inferance
 
-功能为用训练好的模型测试 `./data/food/test` 路径下的所有图片，并生成 `submission.txt` 文件
+功能为用训练好的模型测试 `./data/food/test` 路径下的所有图片，并生成 `./data/submission.txt` 文件
 
 `CUDA_VISIBLE_DEVICES=0 python inferance.py`
