@@ -18,37 +18,45 @@ from utils import adjust_learning_rate, save_checkpoint, train, validate, logger
 
 
 def main():
-    model = resnet34()
-    
-    if cfg.resume:
-        ''' plz implement the resume code by ur self! '''
-        pass
 
-    print('log save at:' + cfg.log_path)
-    logger('', init=True)
-    
     if not torch.cuda.is_available():
         logger('Plz train on cuda !')
         os._exit(0)
 
-    if cfg.gpu is not None:
-        print('Use cuda !')
-        torch.cuda.set_device(cfg.gpu)
-        model = model.cuda(cfg.gpu)
+    print('log save at:' + cfg.log_path)
+    if not cfg.resume:
+        logger('', init=True)
 
     print('Load dataset ...')
     dataset = Food_LT(False, root=cfg.root, batch_size=cfg.batch_size, num_works=4)
 
     train_loader = dataset.train_instance
     val_loader = dataset.eval
+
+    best_acc = 0
+    start_epoch = 0
+
+    model = resnet34()
+
+    if cfg.resume:
+        filename = cfg.root + '/ckpt/current.pth.tar'
+        state = torch.load(filename)
+        model.load_state_dict(state['state_dict_model'])
+        start_epoch = state['epoch']
+        best_acc = state['best_acc']
+        print(f'Resume training...from epoch {start_epoch}')
+
+    if cfg.gpu is not None:
+        print('Use cuda !')
+        torch.cuda.set_device(cfg.gpu)
+        model = model.cuda(cfg.gpu)
     
     criterion = nn.CrossEntropyLoss().cuda(cfg.gpu)
     optimizer = torch.optim.SGD([{"params": model.parameters()}], cfg.lr,
                                 momentum=cfg.momentum,
                                 weight_decay=cfg.weight_decay)
     
-    best_acc = 0
-    for epoch in range(cfg.num_epochs):
+    for epoch in range(start_epoch, cfg.num_epochs):
         logger('--'*10 + f'epoch: {epoch}' + '--'*10)
         logger('Training start ...')
         
