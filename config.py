@@ -1,4 +1,4 @@
-root = '/root/ML'
+root = '/raid/sky/food_cls'
 log_path = './log/log.txt'
 resume = None
 
